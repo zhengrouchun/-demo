@@ -1,0 +1,198 @@
+INFO:     Started server process [28668]
+INFO:     Waiting for application startup.
+2026-09-24 10:47:19,466 INFO meetingbro: MeetingBro backend starting db=D:\语音转文字工具\LocalLecture\data\meetingbro.db hardware=cpu/14c hardware_summary=CUDA unavailable; Whisper cpu int8; Qwen cpu 3 threads whisper_size=small whisper_device=cpu compute=int8 beam=3 cpu_threads=0 whisper_workers=1 preview_backend=whisper-streaming preview_device=cpu preview_compute=int8 preview_asr_workers=1 preview_loaded=True chunk=0.50s accum=2.00s silence_rms=0.0010 audio_conditioning=True denoise=False pre_vad=True pre_vad_conditioning=True pre_vad_threshold=0.38 pre_vad_energy_rms=0.0050 pre_vad_max=8.0s weak_rescue=True weak_rescue_rms=0.0008..0.0200 language_lock=False asr_retry=True asr_safeguard=True safeguard_rtf=0.90 suspicious_no_speech=0.60 suspicious_avg_logprob=-0.90 suspicious_compression=2.10 mixed_mic_gain=1.20 mixed_system_gain=1.00 mixed_auto_balance=True mixed_max_mic_boost=1.80 asr_workers=1 summary_workers=2 translation_workers=2 translation_backfill=20 translation_max_pending=12
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8765 (Press CTRL+C to quit)
+2026-09-24 10:47:23,153 INFO meetingbro.asr.faster_whisper_adapter: loading faster-whisper model size=small device=cpu compute=int8 cpu_threads=0 num_workers=1
+2026-09-24 10:47:25,541 INFO httpx: HTTP Request: GET https://huggingface.co/api/agent-harnesses "HTTP/1.1 200 OK"
+2026-09-24 10:47:25,822 INFO httpx: HTTP Request: GET https://huggingface.co/api/models/Systran/faster-whisper-small/revision/main "HTTP/1.1 200 OK"
+2026-09-24 10:47:30,424 INFO meetingbro: formal ASR ready (model=small device=cpu)
+INFO:     127.0.0.1:61181 - "WebSocket /ws/session?source=loopback&summary_language=en&runtime_profile=balanced&forced_language=zh&loopback_device=%E6%89%AC%E5%A3%B0%E5%99%A8+%28Realtek%28R%29+Audio%29" [accepted]
+INFO:     connection open
+2026-09-24 11:07:03,787 INFO meetingbro: session ws accepted meeting_id=6ccb5c6f-3d3f-40b9-bee4-1465d80a4038 source=loopback profile=balanced chunk=0.50s accum=2.00s
+2026-09-24 11:07:03,793 INFO meetingbro.session.manager: updated audio source=loopback for meeting_id=6ccb5c6f-3d3f-40b9-bee4-1465d80a4038
+2026-09-24 11:07:03,794 INFO meetingbro.audio.loopback: resolving loopback mic by user hint: 扬声器 (Realtek(R) Audio)
+2026-09-24 11:07:04,040 INFO meetingbro.audio.loopback: loopback capture started mic=<Loopback 扬声器 (Realtek(R) Audio) (2 channels)> native_rate=48000 block=24000 target_rate=16000
+2026-09-24 11:07:04,262 INFO meetingbro.audio.loopback: loopback capture stopped
+2026-09-24 11:07:04,287 INFO meetingbro.audio.loopback: resolving loopback mic by user hint: 扬声器 (Realtek(R) Audio)
+2026-09-24 11:07:04,333 INFO meetingbro.audio.loopback: loopback capture started mic=<Loopback 扬声器 (Realtek(R) Audio) (2 channels)> native_rate=48000 block=24000 target_rate=16000
+2026-09-24 11:07:21,533 WARNING meetingbro.audio.loopback: loopback queue full — dropping chunk
+2026-09-24 11:07:21,913 WARNING meetingbro.audio.loopback: loopback queue full — dropping chunk
+2026-09-24 11:07:22,415 WARNING meetingbro.audio.loopback: loopback queue full — dropping chunk
+2026-09-24 11:07:22,912 WARNING meetingbro.audio.loopback: loopback queue full — dropping chunk
+2026-09-24 11:07:23,414 WARNING meetingbro.audio.loopback: loopback queue full — dropping chunk
+2026-09-24 11:07:23,914 WARNING meetingbro.audio.loopback: loopback queue full — dropping chunk
+2026-09-24 11:07:24,422 WARNING meetingbro.audio.loopback: loopback queue full — dropping chunk
+2026-09-24 11:07:24,753 WARNING meetingbro.audio.loopback: loopback queue full — dropping chunk
+2026-09-24 11:07:25,244 WARNING meetingbro.audio.loopback: loopback queue full — dropping chunk
+D:\语音转文字工具\LocalLecture\app\backend\.venv\Lib\site-packages\torch\jit\_serialization.py:176: FutureWarning: `torch.jit.load` is deprecated. Please switch to `torch.export`.
+  warnings.warn(
+2026-09-24 11:07:25,666 WARNING meetingbro.audio.vad: silero-vad unavailable, falling back to RMS gate: open file failed because of errno 2 on fopen: No such file or directory, file path: D:\语音转文字工具\LocalLecture\app\backend\.venv\Lib\site-packages\silero_vad\data\silero_vad.jit
+2026-09-24 11:07:25,755 INFO faster_whisper: Processing audio with duration 00:03.000
+2026-09-24 11:07:25,919 INFO faster_whisper: VAD filter removed 00:00.016 of audio
+D:\语音转文字工具\LocalLecture\app\backend\.venv\Lib\site-packages\soundcard\mediafoundation.py:772: SoundcardRuntimeWarning: data discontinuity in recording
+  warnings.warn("data discontinuity in recording", SoundcardRuntimeWarning)
+2026-09-24 11:07:30,133 WARNING meetingbro.session.manager: ASR safeguard enabled rtf=1.46 wall=4.38s audio=3.00s phase=realtime
+2026-09-24 11:07:30,179 INFO faster_whisper: Processing audio with duration 00:07.500
+2026-09-24 11:07:30,199 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 11:09:08,152 INFO meetingbro.audio.loopback: loopback capture stopped
+2026-09-24 11:23:27,321 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 11:23:27,328 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 11:23:28,269 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 11:24:29,297 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 11:25:29,749 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 11:25:30,215 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 11:27:11,182 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 11:27:11,387 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 11:29:12,155 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 11:29:12,181 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 11:30:26,190 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 11:30:50,103 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 11:30:50,541 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 12:37:23,469 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+INFO:     127.0.0.1:51340 - "WebSocket /ws/session?source=mixed&summary_language=zh&runtime_profile=balanced" [accepted]
+INFO:     connection open
+2026-09-24 13:23:26,100 INFO meetingbro: session ws accepted meeting_id=7b92790d-a716-4d5e-b87e-4547f44f7511 source=mixed profile=balanced chunk=0.50s accum=2.00s
+2026-09-24 13:23:26,334 INFO meetingbro.audio.capture: mic capture started rate=16000 chunk_frames=8000 device=None
+2026-09-24 13:23:26,338 INFO meetingbro.session.manager: updated audio source=mixed for meeting_id=7b92790d-a716-4d5e-b87e-4547f44f7511
+2026-09-24 13:23:26,354 INFO meetingbro.audio.loopback: loopback matched by id: 扬声器 (Realtek(R) Audio) (id='{0.0.0.00000000}.{a0fafe6a-faeb-45f1-927f-4f0b4e4f81f9}')
+2026-09-24 13:23:26,371 INFO meetingbro.audio.loopback: loopback capture started mic=<Loopback 扬声器 (Realtek(R) Audio) (2 channels)> native_rate=48000 block=24000 target_rate=16000
+2026-09-24 13:23:27,295 INFO meetingbro.audio.capture: mic capture stopped
+2026-09-24 13:23:27,296 INFO meetingbro.audio.loopback: loopback capture stopped
+2026-09-24 13:23:27,462 INFO meetingbro.audio.capture: mic capture started rate=16000 chunk_frames=8000 device=None
+2026-09-24 13:23:27,484 INFO meetingbro.audio.loopback: loopback matched by id: 扬声器 (Realtek(R) Audio) (id='{0.0.0.00000000}.{a0fafe6a-faeb-45f1-927f-4f0b4e4f81f9}')
+2026-09-24 13:23:27,504 INFO meetingbro.audio.loopback: loopback capture started mic=<Loopback 扬声器 (Realtek(R) Audio) (2 channels)> native_rate=48000 block=24000 target_rate=16000
+2026-09-24 13:23:28,019 WARNING meetingbro.audio.vad: silero-vad unavailable, falling back to RMS gate: open file failed because of errno 2 on fopen: No such file or directory, file path: D:\语音转文字工具\LocalLecture\app\backend\.venv\Lib\site-packages\silero_vad\data\silero_vad.jit
+2026-09-24 13:23:33,098 INFO meetingbro.session.manager: updated runtime_profile=balanced chunk=0.50s accum=2.00s language_lock=True for meeting_id=7b92790d-a716-4d5e-b87e-4547f44f7511
+2026-09-24 13:23:33,104 INFO meetingbro.session.manager: updated forced_language=zh for meeting_id=7b92790d-a716-4d5e-b87e-4547f44f7511
+2026-09-24 13:23:37,740 INFO meetingbro.session.manager: updated live_translation_language=zh for meeting_id=7b92790d-a716-4d5e-b87e-4547f44f7511
+D:\语音转文字工具\LocalLecture\app\backend\.venv\Lib\site-packages\soundcard\mediafoundation.py:772: SoundcardRuntimeWarning: data discontinuity in recording
+  warnings.warn("data discontinuity in recording", SoundcardRuntimeWarning)
+D:\语音转文字工具\LocalLecture\app\backend\.venv\Lib\site-packages\soundcard\mediafoundation.py:772: SoundcardRuntimeWarning: data discontinuity in recording
+  warnings.warn("data discontinuity in recording", SoundcardRuntimeWarning)
+2026-09-24 13:23:44,067 INFO faster_whisper: Processing audio with duration 00:02.000
+2026-09-24 13:23:44,081 INFO faster_whisper: VAD filter removed 00:01.456 of audio
+2026-09-24 13:23:46,287 INFO faster_whisper: Processing audio with duration 00:02.000
+2026-09-24 13:23:46,298 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:23:48,019 INFO faster_whisper: Processing audio with duration 00:04.000
+2026-09-24 13:23:48,025 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:23:48,672 INFO faster_whisper: Processing audio with duration 00:02.000
+2026-09-24 13:23:48,676 INFO faster_whisper: VAD filter removed 00:00.480 of audio
+D:\语音转文字工具\LocalLecture\app\backend\.venv\Lib\site-packages\soundcard\mediafoundation.py:772: SoundcardRuntimeWarning: data discontinuity in recording
+  warnings.warn("data discontinuity in recording", SoundcardRuntimeWarning)
+2026-09-24 13:23:56,521 INFO faster_whisper: Processing audio with duration 00:08.000
+2026-09-24 13:23:56,542 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:24:04,521 INFO faster_whisper: Processing audio with duration 00:08.000
+2026-09-24 13:24:04,545 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:24:12,522 INFO faster_whisper: Processing audio with duration 00:08.000
+2026-09-24 13:24:12,540 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:24:20,521 INFO faster_whisper: Processing audio with duration 00:08.000
+2026-09-24 13:24:20,540 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:24:28,522 INFO faster_whisper: Processing audio with duration 00:08.000
+2026-09-24 13:24:28,539 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:24:36,522 INFO faster_whisper: Processing audio with duration 00:08.000
+2026-09-24 13:24:36,545 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:24:44,522 INFO faster_whisper: Processing audio with duration 00:08.000
+2026-09-24 13:24:44,534 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:24:47,025 INFO faster_whisper: Processing audio with duration 00:02.000
+2026-09-24 13:24:47,034 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:24:48,646 INFO meetingbro.session.manager: retry suspicious ASR segment text='他的判斷改变经验就好了,他判判的判处就好了。' duration=2.00 conf=0.31 logprob=-0.9225722074508667 no_speech=0.785302996635437 compression=1.032258064516129 signals=2
+2026-09-24 13:24:48,647 INFO meetingbro.session.manager: retrying ASR window with higher-quality preset
+2026-09-24 13:24:48,648 INFO faster_whisper: Processing audio with duration 00:02.000
+2026-09-24 13:24:48,651 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:24:50,333 WARNING meetingbro.session.manager: ASR safeguard enabled rtf=1.65 wall=3.31s audio=2.00s phase=retry
+2026-09-24 13:24:50,339 INFO meetingbro.session.manager: retry suspicious ASR segment text='他的判斷改变经验就好了,他判判的判处就好了。' duration=2.00 conf=0.31 logprob=-0.9225722074508667 no_speech=0.785302996635437 compression=1.032258064516129 signals=2
+2026-09-24 13:24:50,339 INFO meetingbro.session.manager: retry suspicious ASR segment text='他的判斷改变经验就好了,他判判的判备就好了。' duration=2.00 conf=0.32 logprob=-0.9179376025994619 no_speech=0.785302996635437 compression=1.032258064516129 signals=2
+2026-09-24 13:24:50,339 INFO meetingbro.session.manager: retry diverged realtime_score=1 retry_score=1 realtime_text='他的判斷改变经验就好了,他判判的判处就好了。' retry_text='他的判斷改变经验就好了,他判判的判备就好了。'
+2026-09-24 13:24:50,340 INFO meetingbro.session.manager: retry suspicious ASR segment text='他的判斷改变经验就好了,他判判的判备就好了。' duration=2.00 conf=0.32 logprob=-0.9179376025994619 no_speech=0.785302996635437 compression=1.032258064516129 signals=2
+2026-09-24 13:24:52,020 INFO faster_whisper: Processing audio with duration 00:04.500
+2026-09-24 13:24:52,034 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:24:55,018 INFO faster_whisper: Processing audio with duration 00:02.000
+2026-09-24 13:24:55,028 INFO faster_whisper: VAD filter removed 00:00.336 of audio
+2026-09-24 13:24:58,522 INFO faster_whisper: Processing audio with duration 00:03.000
+2026-09-24 13:24:58,527 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:26:49,612 INFO faster_whisper: Processing audio with duration 00:02.500
+2026-09-24 13:26:49,620 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:26:53,112 INFO faster_whisper: Processing audio with duration 00:01.500
+2026-09-24 13:26:53,124 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:26:54,345 INFO meetingbro.session.manager: ASR safeguard cleared rtf=0.82
+2026-09-24 13:26:55,609 INFO faster_whisper: Processing audio with duration 00:01.500
+2026-09-24 13:26:55,618 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:27:02,612 INFO faster_whisper: Processing audio with duration 00:02.500
+2026-09-24 13:27:02,623 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:27:09,110 INFO faster_whisper: Processing audio with duration 00:02.500
+2026-09-24 13:27:09,122 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:27:18,110 INFO faster_whisper: Processing audio with duration 00:03.000
+2026-09-24 13:27:18,122 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:27:20,111 INFO faster_whisper: Processing audio with duration 00:01.000
+2026-09-24 13:27:20,119 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:27:21,425 WARNING meetingbro.session.manager: ASR safeguard enabled rtf=1.32 wall=1.32s audio=1.00s phase=realtime
+2026-09-24 13:27:26,110 INFO faster_whisper: Processing audio with duration 00:02.000
+2026-09-24 13:27:26,120 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:30:38,111 INFO faster_whisper: Processing audio with duration 00:01.000
+2026-09-24 13:30:38,117 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:30:41,609 INFO faster_whisper: Processing audio with duration 00:03.000
+2026-09-24 13:30:41,614 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:30:56,610 INFO faster_whisper: Processing audio with duration 00:01.500
+2026-09-24 13:30:56,615 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:37:54,042 INFO meetingbro.audio.capture: mic capture stopped
+INFO:     127.0.0.1:54532 - "WebSocket /ws/session?source=mixed&summary_language=zh&runtime_profile=balanced&forced_language=zh" [accepted]
+INFO:     connection open
+2026-09-24 13:37:54,049 INFO meetingbro: session ws accepted meeting_id=0b63a6e5-4aa8-453b-91fe-736ca790402f source=mixed profile=balanced chunk=0.50s accum=2.00s
+2026-09-24 13:37:54,052 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 13:37:54,053 INFO meetingbro.session.manager: fast shutdown requested; skipping summary/memory/finalization
+2026-09-24 13:37:54,056 INFO meetingbro.audio.loopback: loopback capture stopped
+2026-09-24 13:37:54,528 INFO meetingbro.audio.capture: mic capture started rate=16000 chunk_frames=8000 device=None
+2026-09-24 13:37:54,530 INFO meetingbro.session.manager: updated audio source=mixed for meeting_id=0b63a6e5-4aa8-453b-91fe-736ca790402f
+2026-09-24 13:37:54,531 INFO meetingbro.session.manager: updated live_translation_language=zh for meeting_id=0b63a6e5-4aa8-453b-91fe-736ca790402f
+2026-09-24 13:37:54,544 INFO meetingbro.audio.loopback: loopback matched by id: 耳机 (A5Pro) (id='{0.0.0.00000000}.{c3eb90b6-0f23-488f-ac56-a0d6ae961573}')
+2026-09-24 13:37:54,550 INFO meetingbro.audio.loopback: loopback capture started mic=<Loopback 耳机 (A5Pro) (2 channels)> native_rate=48000 block=24000 target_rate=16000
+2026-09-24 13:37:55,461 INFO meetingbro.audio.capture: mic capture stopped
+2026-09-24 13:37:55,467 INFO meetingbro.audio.loopback: loopback capture stopped
+2026-09-24 13:37:55,469 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 13:37:55,622 INFO meetingbro.audio.capture: mic capture started rate=16000 chunk_frames=8000 device=None
+2026-09-24 13:37:55,641 INFO meetingbro.audio.loopback: loopback matched by id: 耳机 (A5Pro) (id='{0.0.0.00000000}.{c3eb90b6-0f23-488f-ac56-a0d6ae961573}')
+2026-09-24 13:37:55,648 INFO meetingbro.audio.loopback: loopback capture started mic=<Loopback 耳机 (A5Pro) (2 channels)> native_rate=48000 block=24000 target_rate=16000
+2026-09-24 13:37:56,183 WARNING meetingbro.audio.vad: silero-vad unavailable, falling back to RMS gate: open file failed because of errno 2 on fopen: No such file or directory, file path: D:\语音转文字工具\LocalLecture\app\backend\.venv\Lib\site-packages\silero_vad\data\silero_vad.jit
+2026-09-24 13:37:58,622 INFO meetingbro.audio.capture: mic capture stopped
+INFO:     127.0.0.1:65047 - "WebSocket /ws/session?source=mixed&summary_language=zh&runtime_profile=balanced&forced_language=zh" [accepted]
+INFO:     connection open
+2026-09-24 13:37:58,628 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 13:37:58,628 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 13:37:58,629 INFO meetingbro: session ws accepted meeting_id=3a71d45f-99ba-4e89-8305-eff2e6a2c872 source=mixed profile=balanced chunk=0.50s accum=2.00s
+2026-09-24 13:37:58,630 INFO meetingbro.session.manager: fast shutdown requested; skipping summary/memory/finalization
+2026-09-24 13:37:58,633 INFO meetingbro.audio.loopback: loopback capture stopped
+2026-09-24 13:37:59,205 INFO meetingbro.audio.capture: mic capture started rate=16000 chunk_frames=8000 device=None
+2026-09-24 13:37:59,207 INFO meetingbro.session.manager: updated audio source=mixed for meeting_id=3a71d45f-99ba-4e89-8305-eff2e6a2c872
+2026-09-24 13:37:59,208 INFO meetingbro.session.manager: updated live_translation_language=zh for meeting_id=3a71d45f-99ba-4e89-8305-eff2e6a2c872
+2026-09-24 13:37:59,220 INFO meetingbro.audio.loopback: loopback matched by id: 耳机 (A5Pro) (id='{0.0.0.00000000}.{c3eb90b6-0f23-488f-ac56-a0d6ae961573}')
+2026-09-24 13:37:59,238 INFO meetingbro.audio.loopback: loopback capture started mic=<Loopback 耳机 (A5Pro) (2 channels)> native_rate=48000 block=24000 target_rate=16000
+2026-09-24 13:38:00,175 INFO meetingbro.audio.capture: mic capture stopped
+2026-09-24 13:38:00,176 INFO meetingbro.audio.loopback: loopback capture stopped
+2026-09-24 13:38:00,294 INFO meetingbro.audio.capture: mic capture started rate=16000 chunk_frames=8000 device=None
+2026-09-24 13:38:00,310 INFO meetingbro.audio.loopback: loopback matched by id: 耳机 (A5Pro) (id='{0.0.0.00000000}.{c3eb90b6-0f23-488f-ac56-a0d6ae961573}')
+2026-09-24 13:38:00,318 INFO meetingbro.audio.loopback: loopback capture started mic=<Loopback 耳机 (A5Pro) (2 channels)> native_rate=48000 block=24000 target_rate=16000
+2026-09-24 13:38:00,859 WARNING meetingbro.audio.vad: silero-vad unavailable, falling back to RMS gate: open file failed because of errno 2 on fopen: No such file or directory, file path: D:\语音转文字工具\LocalLecture\app\backend\.venv\Lib\site-packages\silero_vad\data\silero_vad.jit
+2026-09-24 13:39:02,508 INFO faster_whisper: Processing audio with duration 00:02.000
+2026-09-24 13:39:02,521 INFO faster_whisper: VAD filter removed 00:01.392 of audio
+2026-09-24 13:39:04,628 INFO faster_whisper: Processing audio with duration 00:02.000
+2026-09-24 13:39:04,634 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:39:07,085 INFO faster_whisper: Processing audio with duration 00:02.000
+2026-09-24 13:39:07,092 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:39:09,565 INFO faster_whisper: Processing audio with duration 00:02.000
+2026-09-24 13:39:09,575 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:39:09,853 INFO faster_whisper: Processing audio with duration 00:07.500
+2026-09-24 13:39:09,869 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:39:13,851 INFO faster_whisper: Processing audio with duration 00:03.000
+2026-09-24 13:39:13,867 INFO faster_whisper: VAD filter removed 00:00.008 of audio
+2026-09-24 13:40:35,765 INFO meetingbro.audio.capture: mic capture stopped
+2026-09-24 13:40:35,768 INFO faster_whisper: Processing audio with duration 00:00.500
+2026-09-24 13:40:35,768 INFO meetingbro.audio.loopback: loopback capture stopped
+2026-09-24 13:40:35,772 INFO faster_whisper: VAD filter removed 00:00.000 of audio
+2026-09-24 13:40:36,972 WARNING meetingbro.session.manager: ASR safeguard enabled rtf=2.41 wall=1.20s audio=0.50s phase=realtime
+2026-09-24 13:40:40,266 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 13:40:57,693 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 13:40:58,024 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 13:43:16,952 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 13:43:17,622 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0
+2026-09-24 13:57:31,320 WARNING meetingbro.audio.devices: loopback enumeration failed: Error 0x800401f0

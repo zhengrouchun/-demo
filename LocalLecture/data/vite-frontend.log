@@ -1,0 +1,22 @@
+
+> meetingbro-frontend@0.1.0 dev:vite
+> vite
+
+
+  VITE v5.4.21  ready in 2824 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+11:23:26 [vite] hmr update /src/App.tsx
+11:23:26 [vite] hmr update /src/App.tsx
+11:24:28 [vite] hmr update /src/App.tsx
+11:25:29 [vite] hmr update /src/App.tsx
+11:26:49 [vite] hmr update /src/components/HistoryModal.tsx
+11:26:59 [vite] hmr update /src/components/BackendGate.tsx
+11:27:10 [vite] page reload index.html
+11:27:56 [vite] hmr update /src/components/SettingsModal.tsx
+11:29:11 [vite] hmr update /src/App.tsx
+11:30:25 [vite] hmr update /src/App.tsx
+13:37:52 [vite] hmr update /src/App.tsx
+13:37:57 [vite] hmr update /src/App.tsx

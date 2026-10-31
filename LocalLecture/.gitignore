@@ -1,0 +1,48 @@
+.env
+
+# Python
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Python virtual environments
+.venv/
+**/.venv/
+
+# Frontend dependencies/build artifacts
+app/frontend/node_modules/
+app/frontend/dist/
+app/frontend/dist-node-types/
+app/frontend/*.tsbuildinfo
+app/frontend/tsconfig*.tsbuildinfo
+
+# Local runtime data
+data/*.db
+data/*.db-*
+data/meetingbro.db
+data/meetingbro.db-*
+data/growmate/
+data/growmate-qa/
+data/growmate-web*.log
+data/voice_test_*.wav
+data/benchmark_profile_*.json
+# Synthetic fixtures: regenerated from data/benchmark/synth_spec.json (committed).
+data/benchmark/synth/
+# Real audio fixtures (AMI excerpt): regenerated via scripts/fetch_ami_fixture.py
+data/benchmark/real/
+
+# Exports and local scratch output
+exports/*
+!exports/.gitkeep
+.backup/
+
+# Local ASR / ML model artifacts (large, not source code)
+models/
+
+# Python package metadata
+*.egg-info/
+app/backend/*.egg-info/
+
+# Subagent-driven-development scratch (controller ledger)
+.superpowers/

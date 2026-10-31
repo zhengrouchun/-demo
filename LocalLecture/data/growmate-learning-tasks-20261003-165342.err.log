@@ -1,0 +1,52 @@
+INFO:     Started server process [55168]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8876 (Press CTRL+C to quit)
+INFO:     127.0.0.1:65517 - "WebSocket /api/voice/socket" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:58615 - "WebSocket /api/voice/socket" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:50942 - "WebSocket /api/voice/socket" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:50645 - "WebSocket /api/voice/socket" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:63176 - "WebSocket /api/voice/socket" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:57681 - "WebSocket /api/voice/socket" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:57882 - "WebSocket /api/voice/socket" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:64258 - "WebSocket /api/voice/socket" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:49346 - "WebSocket /api/voice/socket" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:61312 - "WebSocket /api/voice/socket" [accepted]
+INFO:     connection open
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost(None)
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost(None)>
+Traceback (most recent call last):
+  File "C:\Users\Stu15\AppData\Roaming\uv\python\cpython-3.12.14-windows-x86_64-none\Lib\asyncio\events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "C:\Users\Stu15\AppData\Roaming\uv\python\cpython-3.12.14-windows-x86_64-none\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+ERROR:asyncio:Exception in callback _ProactorBasePipeTransport._call_connection_lost(None)
+handle: <Handle _ProactorBasePipeTransport._call_connection_lost(None)>
+Traceback (most recent call last):
+  File "C:\Users\Stu15\AppData\Roaming\uv\python\cpython-3.12.14-windows-x86_64-none\Lib\asyncio\events.py", line 88, in _run
+    self._context.run(self._callback, *self._args)
+  File "C:\Users\Stu15\AppData\Roaming\uv\python\cpython-3.12.14-windows-x86_64-none\Lib\asyncio\proactor_events.py", line 165, in _call_connection_lost
+    self._sock.shutdown(socket.SHUT_RDWR)
+ConnectionResetError: [WinError 10054] 远程主机强迫关闭了一个现有的连接。
+INFO:     127.0.0.1:54742 - "WebSocket /api/voice/socket" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:54067 - "WebSocket /api/voice/socket" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:56072 - "WebSocket /api/voice/socket" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:56037 - "WebSocket /api/voice/socket" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:54620 - "WebSocket /api/voice/socket" [accepted]
+INFO:     connection open
+INFO:     127.0.0.1:61590 - "WebSocket /api/voice/socket" [accepted]
+INFO:     connection open

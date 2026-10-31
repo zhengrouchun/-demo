@@ -1,0 +1,18 @@
+export type Page = "home" | "focus" | "forest" | "records" | "companion" | "settings";
+export interface Tree { id: string; species_id: string; status: "growing" | "mature" | "dead"; growth: number; health: number; stage: string; planted_at: string; last_watered_at: string | null; matured_at: string | null; total_water: number; focus_count: number }
+export interface Species { id: string; name: string; emoji: string; description: string; unlocked: boolean }
+export interface FocusSession { id: string; mode: string; started_at: string; planned_seconds: number; actual_seconds: number; completed: number; interrupted: number; water_earned: number; tree_id: string | null; task_id?: string | null; task_note_id?: string | null; task_text?: string | null; task_decision?: string | null }
+export interface FocusResult { id: string; message: string; earned: number; minutes?: number; task_id?: string | null; task_note_id?: string | null; task_text?: string | null; task_decision?: "complete" | "keep" | null }
+export interface Timer { mode: string; minutes: number; rest: number; cycles: number; cycle: number; phase: "focus" | "rest"; deadline: string; session_id: string; task_id?: string | null; task_note_id?: string | null; task_text?: string | null }
+export interface NoteTask { id: string; note_id?: string; line_index: number; text: string; completed: boolean; tags: string[]; due_date: string | null; focus_seconds: number; reward_awarded: boolean; completion_rewarded?: boolean }
+export interface Note { id: string; title: string; markdown: string; created_at: string; updated_at: string; tasks: NoteTask[] }
+export interface HealthLog { date: string; breakfast: string; lunch: string; dinner: string; snacks: string; stomach_note: string; general_note: string }
+export interface MoodLog { id: string; date: string; mood: string; content: string; created_at: string }
+export interface Reminder { id: string; title: string; body: string; hour: number; minute: number; enabled: number; delivered_at?: string }
+export interface VoiceSession { id: string; title: string; source: string; model: string; language: string; started_at: string; ended_at: string | null; status: string; elapsed_seconds: number; export_path: string | null; error: string | null }
+export interface Segment { id: string; start_time: number; end_time: number; text: string; confidence: number; quality?: string }
+export interface Voice { phase: string; detail: string; session: VoiceSession | null; segments: Segment[]; stats: { elapsed_seconds?: number; audio_input_backlog_seconds?: number; asr_realtime_factor?: number }; worker_pid: number | null; resources_released: boolean }
+export interface Conversation { id: string; title: string; mode: string; updated_at: string }
+export interface Message { id: string; role: string; content: string; created_at: string }
+export interface AppState { today: string; water_balance: number; trees: Tree[]; species: Species[]; focus_sessions: FocusSession[]; today_focus_seconds: number; timer: Timer | null; focus_result: FocusResult | null; notes: Note[]; images: { id: string; note_id: string; uri: string }[]; health_logs: HealthLog[]; mood_logs: MoodLog[]; reminders: Reminder[]; memories: { id: string; content: string; enabled: number }[]; conversations: Conversation[]; voice_sessions: VoiceSession[]; ai_model: string; ai: { configured: boolean; remembered: boolean; can_remember: boolean }; notices: Reminder[]; voice: Voice; transactions: { id: string; amount: number; type: string; created_at: string }[] }
+export interface ViewProps { state: AppState; navigate: (page: Page) => void; run: (operation: () => Promise<unknown>, success?: string) => Promise<boolean>; refresh: () => Promise<void> }

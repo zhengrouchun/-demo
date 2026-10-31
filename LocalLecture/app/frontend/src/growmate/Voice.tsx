@@ -1,0 +1,35 @@
+import { useEffect, useRef, useState } from "react";
+import { api, dateTime, time } from "./api";
+import { Card, Empty } from "./components";
+import type { Segment, ViewProps, VoiceSession } from "./types";
+
+interface Devices { mics: { id: string; name: string }[]; loopbacks: { id: string; name: string }[]; system_default: { id: string; name: string } | null }
+export function VoiceRecorder({ state, run, refresh }: ViewProps) {
+  const [title, setTitle] = useState("");
+  const [source, setSource] = useState("system");
+  const [model, setModel] = useState("small");
+  const [language, setLanguage] = useState("zh");
+  const [audioDevice, setAudioDevice] = useState("");
+  const [loopbackDevice, setLoopbackDevice] = useState("");
+  const [devices, setDevices] = useState<Devices | null>(null);
+  const [deviceBusy, setDeviceBusy] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [history, setHistory] = useState<{ session: VoiceSession; segments: Segment[] } | null>(null);
+  const bottom = useRef<HTMLDivElement>(null);
+  const voice = state.voice;
+  const active = !voice.resources_released;
+  const segments = history?.segments ?? voice.segments;
+  const session = history?.session ?? voice.session;
+  useEffect(() => { if (!history) bottom.current?.scrollIntoView({ behavior: "smooth", block: "nearest" }); }, [voice.segments.length, history]);
+  async function loadDevices() {
+    setDeviceBusy(true);
+    await run(async () => { setDevices(await api<Devices>("/audio/devices")); });
+    setDeviceBusy(false);
+  }
+  async function start() {
+    setBusy(true); setHistory(null);
+    await run(() => api("/voice/start", { title: title.trim() || "课堂逐字稿", source, model, language, audio_device: audioDevice, loopback_device: loopbackDevice }));
+    setBusy(false);
+  }
+  return <><div className="gm-voice-grid"><Card title="实时录音转文字"><p className="gm-muted">声音在电脑本地识别。只保存文字，原始音频不长期落盘。</p><fieldset disabled={active || busy}><label>课程或录音名称<input placeholder="例如：计算机网络 第五课" maxLength={200} value={title} onChange={e => setTitle(e.target.value)} /></label><label>声音来源<select value={source} onChange={e => setSource(e.target.value)}><option value="system">电脑系统声音 · 网课与本地视频</option><option value="mic">麦克风 · 现实课堂与口述</option><option value="mixed">系统声音＋麦克风</option></select></label><div className="gm-form-grid"><label>本地 Whisper 模型<select value={model} onChange={e => setModel(e.target.value)}><option value="small">Small · 推荐</option><option value="base">Base · 更省资源</option><option value="tiny">Tiny · 最省资源</option></select></label><label>识别语言<select value={language} onChange={e => setLanguage(e.target.value)}><option value="zh">中文</option><option value="en">英文</option><option value="auto">自动检测</option></select></label></div>{source !== "system" && <label>麦克风<select value={audioDevice} onChange={e => setAudioDevice(e.target.value)}><option value="">Windows 默认麦克风</option>{devices?.mics.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}</select></label>}{source !== "mic" && <label>系统声音设备<select value={loopbackDevice} onChange={e => setLoopbackDevice(e.target.value)}><option value="">Windows 默认播放设备</option>{devices?.loopbacks.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}</select></label>}</fieldset><button className="gm-secondary" disabled={active || deviceBusy} onClick={loadDevices}>{deviceBusy ? "正在读取声音设备…" : "刷新声音设备"}</button>{devices && <p className="gm-muted">找到 {devices.mics.length} 个麦克风、{devices.loopbacks.length} 个系统采音设备。默认输出：{devices.system_default?.name ?? "未找到"}</p>}<div className="gm-voice-actions">{!active ? <button disabled={busy} onClick={start}>{busy ? "正在启动…" : "🎙️ 开始实时转写"}</button> : <><button className="gm-secondary" disabled={busy || !["running", "paused"].includes(voice.phase)} onClick={() => run(() => api(`/voice/${voice.phase === "paused" ? "resume" : "pause"}`, {}))}>{voice.phase === "paused" ? "继续转写" : "暂停"}</button><button className="gm-danger" disabled={voice.phase === "draining"} onClick={() => run(() => api("/voice/stop", {}))}>{voice.phase === "loading" ? "取消加载" : voice.phase === "draining" ? "正在保存…" : "结束并保存逐字稿"}</button></>}</div><p className="gm-muted">加载完成后才开始采音。结束后需要等剩余声音处理完成。刷新页面不会停止录音，请用结束按钮停止。</p></Card><Card title={history ? session?.title : "正在保存的逐字稿"}><div className="gm-voice-status"><span className={`gm-status ${active ? "active" : ""}`}>{history ? "历史记录" : ({ idle: "待开始", loading: "模型加载中", running: "实时转写中", paused: "已暂停", draining: "正在整理", ended: "转写完成", interrupted: "已中断", export_failed: "待重新导出" } as Record<string, string>)[voice.phase] ?? voice.phase}</span><strong>{time(history ? session?.elapsed_seconds ?? 0 : voice.stats.elapsed_seconds ?? session?.elapsed_seconds ?? 0)}</strong><span>{segments.reduce((count, s) => count + s.text.length, 0).toLocaleString()} 字</span></div>{!history && <p className="gm-muted" role="status">{voice.detail}</p>}{session?.error && <p className="gm-error">{session.error}</p>}<div className="gm-transcript">{segments.length > 200 && <p className="gm-muted">显示最近 200 段；下载包含完整逐字稿。</p>}{segments.slice(-200).map(s => <article key={s.id}><time>{time(s.start_time)} — {time(s.end_time)}</time><p>{s.text}</p>{s.quality && s.quality !== "ok" && <small>建议核对这一段</small>}</article>)}{!segments.length && <Empty>{active ? "播放网课或对着麦克风讲话，识别出的文字会持续出现在这里。" : "开始后，课堂上的每一段声音都会逐步变成文字。"}</Empty>}<div ref={bottom} /></div>{session && <div className="gm-voice-actions"><a className="gm-button" href={`/api/voice/history/${session.id}/download`} download>{active && !history ? "下载已保存部分" : "下载完整 Markdown"}</a>{history && <button className="gm-secondary" onClick={() => setHistory(null)}>返回当前转写</button>}</div>}{!history && voice.resources_released && voice.session && <p className="gm-release">✓ 识别进程已退出，模型与音频内存已释放。</p>}{session?.export_path && <p className="gm-path">电脑保存位置：{session.export_path}</p>}</Card></div><Card title="历史录音逐字稿">{state.voice_sessions.length ? <div className="gm-ledger">{state.voice_sessions.map(s => <div key={s.id}><span><strong>{s.title}</strong><small>{dateTime(s.started_at)} · {s.status === "ended" ? "已完成" : s.status === "interrupted" ? "可恢复" : s.status === "export_failed" ? "可重试导出" : "处理中"}</small></span><div className="gm-inline-actions"><button className="gm-secondary" onClick={() => run(async () => { setHistory(await api(`/voice/history/${s.id}`)); })}>查看文字</button><a className="gm-button gm-secondary" href={`/api/voice/history/${s.id}/download`} download>下载</a></div></div>)}</div> : <Empty>结束转写后，可以随时回来查看和重新导出。</Empty>}<button className="gm-text-button" onClick={() => run(refresh)}>刷新历史列表</button></Card></>;
+}
