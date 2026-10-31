@@ -14,6 +14,16 @@ from score_classroom_transcription import character_error_rate, evaluate_transcr
 
 
 class ClassroomAccuracyTests(unittest.TestCase):
+    def test_system_only_manifest_can_pass_improvement_gate(self):
+        result = evaluate_transcripts(
+            references={"system": "甲乙丙丁戊"},
+            transcripts={
+                "whisper-small": {"system": "甲错丙丁戊"},
+                "candidate": {"system": "甲乙丙丁戊"},
+            },
+        )
+        self.assertTrue(result["engines"]["candidate"]["cer_gate_passed"])
+
     def test_normalizes_fullwidth_case_punctuation_and_spaces(self):
         self.assertEqual(character_error_rate("ＴＣＰ 协议，ＡＢＣ。", "tcp协议abc"), 0.0)
 

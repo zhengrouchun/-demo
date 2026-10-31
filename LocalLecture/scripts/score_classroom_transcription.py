@@ -1,4 +1,4 @@
-"""Measure CER on representative system-audio and microphone transcripts."""
+"""Measure CER on system audio, with optional legacy microphone samples."""
 
 import argparse
 import json
@@ -32,8 +32,11 @@ def character_error_rate(reference: str, transcript: str) -> float:
 
 
 def evaluate_transcripts(references: dict[str, str], transcripts: dict[str, dict[str, str]]) -> dict:
-    """Score both sources equally and flag the CER gate only."""
-    for source in SOURCE_NAMES:
+    """Score the supplied sources and flag the CER gate only."""
+    source_names = tuple(source for source in SOURCE_NAMES if source in references)
+    if "system" not in source_names:
+        raise ValueError("system reference is required")
+    for source in source_names:
         if source not in references or not _normalized_characters(references[source]):
             raise ValueError(f"{source} reference has no transcription characters")
     if BASELINE_NAME not in transcripts:
@@ -42,11 +45,11 @@ def evaluate_transcripts(references: dict[str, str], transcripts: dict[str, dict
     engines = {}
     for engine_name, by_source in transcripts.items():
         source_scores = {}
-        for source in SOURCE_NAMES:
+        for source in source_names:
             if source not in by_source:
                 raise ValueError(f"{engine_name} is missing {source} transcript")
             source_scores[f"{source}_cer"] = character_error_rate(references[source], by_source[source])
-        source_scores["mean_cer"] = sum(source_scores.values()) / len(SOURCE_NAMES)
+        source_scores["mean_cer"] = sum(source_scores.values()) / len(source_names)
         engines[engine_name] = source_scores
 
     baseline = engines[BASELINE_NAME]
@@ -56,7 +59,7 @@ def evaluate_transcripts(references: dict[str, str], transcripts: dict[str, dict
             engine_name != BASELINE_NAME
             and baseline_mean_cer > 0
             and scores["mean_cer"] <= baseline_mean_cer * (1 - MINIMUM_RELATIVE_IMPROVEMENT)
-            and all(scores[f"{source}_cer"] <= baseline[f"{source}_cer"] for source in SOURCE_NAMES)
+            and all(scores[f"{source}_cer"] <= baseline[f"{source}_cer"] for source in source_names)
         )
     return {"baseline_mean_cer": baseline_mean_cer, "engines": engines}
 
@@ -65,14 +68,15 @@ def score_manifest(manifest_path: Path) -> dict:
     """Read text paths relative to a manifest without including text in output."""
     manifest = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
     directory = manifest_path.parent
+    source_names = tuple(source for source in SOURCE_NAMES if source in manifest["references"])
     references = {
         source: (directory / manifest["references"][source]).read_text(encoding="utf-8-sig")
-        for source in SOURCE_NAMES
+        for source in source_names
     }
     transcripts = {
         engine_name: {
             source: (directory / by_source[source]).read_text(encoding="utf-8-sig")
-            for source in SOURCE_NAMES
+            for source in source_names
         }
         for engine_name, by_source in manifest["transcripts"].items()
     }
@@ -81,6 +85,6 @@ def score_manifest(manifest_path: Path) -> dict:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("manifest", type=Path, help="JSON file listing two references and each engine's text files")
+    parser.add_argument("manifest", type=Path, help="JSON file listing system reference and each engine's text file")
     arguments = parser.parse_args()
     print(json.dumps(score_manifest(arguments.manifest), indent=2, sort_keys=True))
