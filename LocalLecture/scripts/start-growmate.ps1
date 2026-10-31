@@ -1,10 +1,11 @@
-﻿param([switch]$NoBrowser)
+﻿param([switch]$NoBrowser, [switch]$Transcript)
 $ErrorActionPreference = 'Stop'
 $repoPath = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $pythonPath = Join-Path $repoPath 'app\backend\.venv\Scripts\python.exe'
 $backendPath = Join-Path $repoPath 'app\backend'
 $frontendPath = Join-Path $repoPath 'app\frontend'
 $url = 'http://127.0.0.1:8876'
+$openUrl = if ($Transcript) { "$url/?transcript" } else { $url }
 
 if (-not (Test-Path -LiteralPath $pythonPath)) {
     throw '未找到 Python 环境。请先在 LocalLecture 目录运行 .\scripts\install.ps1。'
@@ -13,7 +14,7 @@ try {
     $existing = Invoke-RestMethod -Uri "$url/health" -TimeoutSec 2
     if ($existing.app -eq 'GrowMate') {
         Write-Host 'GrowMate 已在运行，正在打开浏览器。'
-        if (-not $NoBrowser) { Start-Process $url }
+        if (-not $NoBrowser) { Start-Process $openUrl }
         exit 0
     }
     throw '8876 端口被其他服务使用。请先检查占用程序。'
@@ -61,7 +62,7 @@ try {
     if (-not $ready) { throw "服务启动超时，请检查 $errLog" }
     Write-Host "GrowMate 已启动：$url"
     Write-Host '请保留这个窗口。结束录音并看到“资源已释放”后，可按 Ctrl+C 关闭服务。'
-    if (-not $NoBrowser) { Start-Process $url }
+    if (-not $NoBrowser) { Start-Process $openUrl }
     while (-not $server.HasExited) { Start-Sleep -Seconds 1 }
 } finally {
     if (-not $server.HasExited) {

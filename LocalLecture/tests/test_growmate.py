@@ -18,7 +18,7 @@ sys.path.insert(0, str(ROOT / "app" / "backend"))
 from meetingbro.growmate.domain import water_reward, missing_water_days, growth_stage
 from meetingbro.growmate.repository import Repository
 from meetingbro.growmate.ai import SecretStore
-from meetingbro.growmate.transcript import safe_filename
+from meetingbro.growmate.transcript import safe_filename, saved_segments
 from meetingbro.growmate.voice import VoiceController
 from meetingbro.growmate.web import create_app
 from fastapi.testclient import TestClient
@@ -228,6 +228,49 @@ class VoiceProcessTests(unittest.IsolatedAsyncioTestCase):
                 self.assertFalse(list(app_data.rglob("*.wav")))
                 with closing(__import__("sqlite3").connect(controller.transcript_db)) as conn:
                     self.assertEqual(conn.execute("SELECT COUNT(*) FROM summary_snapshots").fetchone()[0], 0)
+            finally:
+                await controller.close()
+                repo.close()
+
+
+    async def test_funasr_system_audio_fixture_exports_real_model_name(self):
+        fixture = ROOT / "data" / "benchmark" / "coverage_zh.wav"
+        with tempfile.TemporaryDirectory() as temporary_folder:
+            app_data = Path(temporary_folder) / "data"
+            repo = Repository(app_data / "growmate.db")
+            controller = VoiceController(repo, app_data)
+            try:
+                await controller.start({"title": "系统声测试", "source": "system", "model": "funasr-nano-gguf-q8_0", "language": "zh", "_fixture_path": str(fixture)})
+                await asyncio.wait_for(controller.task, timeout=180)
+                snapshot = controller.snapshot()["payload"]
+                self.assertEqual(snapshot["phase"], "ended", snapshot)
+                self.assertTrue(snapshot["segments"])
+                exported = Path(snapshot["session"]["export_path"])
+                self.assertIn("Fun-ASR-Nano GGUF Q8_0 / CPU", exported.read_text(encoding="utf-8"))
+                self.assertFalse(list(app_data.rglob("*.wav")))
+            finally:
+                await controller.close()
+                repo.close()
+
+    async def test_forced_exit_recovers_committed_text(self):
+        fixture = ROOT / "data" / "benchmark" / "coverage_zh.wav"
+        with tempfile.TemporaryDirectory() as temporary_folder:
+            app_data = Path(temporary_folder) / "data"
+            repo = Repository(app_data / "growmate.db")
+            controller = VoiceController(repo, app_data)
+            try:
+                await controller.start({"title": "强退恢复测试", "source": "system", "model": "funasr-nano-gguf-q8_0", "language": "zh", "_test_asr": True, "_fixture_path": str(fixture), "_fixture_realtime": True})
+                for _ in range(200):
+                    if controller.segments:
+                        break
+                    await asyncio.sleep(0.1)
+                self.assertTrue(controller.segments)
+                session_id = controller.current_id
+                controller.process.kill()
+                await asyncio.wait_for(controller.task, timeout=30)
+                row = repo.rows("SELECT * FROM voice_sessions WHERE id=?", (session_id,))[0]
+                self.assertEqual(row["status"], "interrupted")
+                self.assertTrue(saved_segments(controller.transcript_db, row["meeting_id"]))
             finally:
                 await controller.close()
                 repo.close()

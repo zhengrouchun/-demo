@@ -35,7 +35,8 @@ def export_transcript(session, segments, root: Path) -> Path:
     sources = {"mic": "麦克风", "system": "电脑系统声音", "mixed": "系统声音与麦克风", "fixture": "测试音频"}
     duration = max([session["elapsed_seconds"] or 0, *(s["end_time"] for s in segments)])
     title = session["title"].replace("\r", " ").replace("\n", " ")
-    lines = [f"# {title}", "", f"- 日期：{date}", f"- 时长：{clock(duration)}", f"- 音频来源：{sources.get(session['source'], session['source'])}", f"- 识别语言：{session['language']}", f"- 识别模型：Whisper {session['model']} / CPU int8", "", "---", "", "## 课堂逐字稿", ""]
+    model_name = "Fun-ASR-Nano GGUF Q8_0 / CPU" if session["model"] == "funasr-nano-gguf-q8_0" else f"Whisper {session['model']} / CPU int8"
+    lines = [f"# {title}", "", f"- 日期：{date}", f"- 时长：{clock(duration)}", f"- 音频来源：{sources.get(session['source'], session['source'])}", f"- 识别语言：{session['language']}", f"- 识别模型：{model_name}", "", "---", "", "## 课堂逐字稿", ""]
     if session["status"] not in ("ended", "export_failed"):
         lines += ["这是一份恢复或中途导出的逐字稿，包含已经保存的文字。", ""]
     if session.get("error"):  # 导出后仍保留漏音或识别失败提示，便于核对原视频。

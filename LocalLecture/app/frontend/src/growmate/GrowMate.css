@@ -39,6 +39,7 @@ body { margin: 0; }
 .gm-sidebar-bottom > span { font-weight: 650; padding-left: 1rem; }
 .gm-sidebar-bottom small { padding-left: 1rem; color: var(--gm-muted); }
 .gm-main { max-width: 1480px; padding: 2.4rem 3rem 1rem; margin-left: 230px; }
+.gm-transcript-page .gm-main { max-width: 1200px; margin: 0 auto; }
 .gm-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.8rem; }
 .gm-eyebrow { color: var(--gm-muted); font-size: .9375rem; margin-bottom: .35rem !important; }
 .gm-card { background: #fffefb; border: 1px solid var(--gm-border); border-radius: 19px; padding: 1.5rem; box-shadow: 0 4px 16px #34412104; margin-bottom: 1.35rem; min-width: 0; }

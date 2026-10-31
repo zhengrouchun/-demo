@@ -19,6 +19,7 @@ async def _run(options, commands, events):
     import numpy as np
     from ..asr.base import ASRAdapter, ASRSegment
     from ..asr.faster_whisper_adapter import FasterWhisperAdapter
+    from ..asr.funasr_cli_adapter import FunASRNanoAdapter
     from ..audio import MicrophoneSource, MixedAudioSource, SystemAudioLoopbackSource, WavFileSource
     from ..session.manager import SessionConfig, SessionManager
     from ..storage.db import Storage
@@ -44,7 +45,8 @@ async def _run(options, commands, events):
         async def _emit_memory(self, *, force=False):
             return
 
-    events.put({"type": "loading", "payload": {"message": "正在加载本地 Whisper 模型，首次使用可能需要下载。"}})
+    selected_model = options["model"]
+    events.put({"type": "loading", "payload": {"message": f"正在加载本地 {selected_model} 模型。"}})
     if options.get("_test_asr"):
         class FixtureASR(ASRAdapter):
             def __init__(self):
@@ -54,6 +56,15 @@ async def _run(options, commands, events):
                 self.calls += 1
                 return [ASRSegment(0, len(samples) / sample_rate, f"这是第{self.calls}段用于验证完整转写链路的测试文字。", "zh", .95)]
         asr = FixtureASR()
+    elif selected_model == "funasr-nano-gguf-q8_0":
+        model_root = Path(__file__).resolve().parents[4] / "models" / "classroom-benchmark"
+        asr = FunASRNanoAdapter(
+            executable=model_root / "funasr-runtime" / "llama-funasr-cli.exe",
+            encoder=model_root / "funasr" / "funasr-encoder-f16.gguf",
+            decoder=model_root / "funasr" / "qwen3-0.6b-q8_0.gguf",
+            working_directory=model_root.parent.parent,
+        )
+        await asyncio.to_thread(asr.ensure_loaded)
     else:
         asr = FasterWhisperAdapter(**model_options(options["model"]))  # 限制线程争用并比较多个候选。
         await asyncio.to_thread(asr.ensure_loaded)
@@ -79,6 +90,9 @@ async def _run(options, commands, events):
             device = int(device)
         source = MicrophoneSource(chunk_seconds=.5, device=device)
     storage = Storage(Path(options["transcript_db"]))
+    coverage_options = session_options(options["language"])
+    if selected_model == "funasr-nano-gguf-q8_0":
+        coverage_options["asr_early_flush_enabled"] = False
     manager = TranscriptSession(SessionConfig(
         audio_source=source,  # 接收用户选定的麦克风或系统音频。
         audio_source_name=options["source"],  # 保存音频来源供状态显示。
@@ -90,7 +104,7 @@ async def _run(options, commands, events):
         summary_language="zh",  # 保留会话所需的默认语言字段。
         language_lock_enabled=options["language"] != "auto",  # 自动模式不强制锁定语言。
         watchdog_enabled=not options.get("_fixture_path"),  # 实际录音检测卡顿，离线测试跳过。
-        **session_options(options["language"]),  # 统一应用连续音频及所选语言的配置。
+        **coverage_options,  # 统一应用连续音频及所选语言的配置。
     ))
     with closing(sqlite3.connect(options["app_db"], timeout=10)) as conn:
         conn.execute("UPDATE voice_sessions SET meeting_id=? WHERE id=?", (manager.meeting_id, options["id"]))

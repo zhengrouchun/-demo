@@ -4,12 +4,13 @@ import { Home, Forest } from "./HomeForest";
 import { Focus } from "./Focus";
 import { Records } from "./Records";
 import { Companion, Settings } from "./CompanionSettings";
+import { VoiceRecorder } from "./Voice";
 import type { AppState, Page, Voice } from "./types";
 import "./GrowMate.css";
 
 const NAV: { id: Page; label: string; icon: string }[] = [{ id: "home", label: "首页", icon: "🏡" }, { id: "focus", label: "专注", icon: "⏱️" }, { id: "forest", label: "森林", icon: "🌳" }, { id: "records", label: "记录", icon: "📝" }, { id: "companion", label: "陪伴", icon: "🐶" }];
 
-export default function GrowMateApp() {
+export default function GrowMateApp({ transcriptOnly = false }: { transcriptOnly?: boolean }) {
   const [page, setPage] = useState<Page>("home");
   const [state, setState] = useState<AppState | null>(null);
   const [error, setError] = useState("");
@@ -42,6 +43,7 @@ export default function GrowMateApp() {
   }, [refresh]);
 
   useEffect(() => {
+    if (transcriptOnly) return;
     const heartbeat = () => { const current = stateRef.current; if (current?.timer && (current.timer.mode !== "strict" || !document.hidden)) api("/focus/heartbeat", {}).catch(() => {}); };
     const interrupt = () => { if (stateRef.current?.timer?.mode === "strict") { fetch("/api/focus/interrupt", { method: "POST", headers: { "X-GrowMate-Request": "1" }, keepalive: true }).then(refresh).catch(() => {}); } };
     const visibility = () => { if (document.hidden) interrupt(); else { heartbeat(); refresh().catch(() => {}); } };
@@ -51,7 +53,7 @@ export default function GrowMateApp() {
     document.addEventListener("fullscreenchange", fullscreen);
     window.addEventListener("pagehide", interrupt);
     return () => { window.clearInterval(timer); document.removeEventListener("visibilitychange", visibility); document.removeEventListener("fullscreenchange", fullscreen); window.removeEventListener("pagehide", interrupt); };
-  }, [refresh]);
+  }, [refresh, transcriptOnly]);
 
   const navigate = useCallback((next: Page) => {
     if (stateRef.current?.timer?.mode === "strict" && next !== "focus") {
@@ -62,5 +64,6 @@ export default function GrowMateApp() {
 
   if (!state) return <div className="growmate gm-loading"><span>🐶🌱</span><h1>GrowMate</h1><p>{error || "正在打开你的森林…"}</p><button onClick={() => run(refresh)}>重新连接</button><p className="gm-muted">请先双击“启动GrowMate网页版.cmd”。</p></div>;
   const props = { state, navigate, run, refresh };
+  if (transcriptOnly) return <div className="growmate gm-transcript-page"><main className="gm-main"><h1>课堂系统声音转文字</h1><p className="gm-muted">免费本地识别，模型：Fun-ASR-Nano。开始前请让课程在当前播放设备正常发声。</p>{error && <div className="gm-error-banner" role="alert">{error}</div>}<VoiceRecorder {...props} systemOnly /><p className="gm-muted">历史备份 ZIP 如已生成，删除单条课程不会修改旧备份。</p></main>{toast && <div className="gm-toast" role="status">✓ {toast}</div>}</div>;
   return <div className="growmate"><aside className="gm-sidebar"><div className="gm-brand"><span>🐶</span><div><strong>GrowMate</strong><small>小狗陪你慢慢成长</small></div></div><nav aria-label="主导航">{NAV.map(n => <button key={n.id} className={page === n.id ? "selected" : ""} onClick={() => navigate(n.id)}><span>{n.icon}</span>{n.label}{n.id === "records" && !state.voice.resources_released && <i className="gm-recording-dot" aria-label="正在转写" />}</button>)}</nav><div className="gm-sidebar-bottom"><span>💧 {state.water_balance} 滴水</span><small>{socketConnected ? "本地服务已连接" : "正在恢复实时连接…"}</small><button className={page === "settings" ? "selected" : ""} onClick={() => navigate("settings")}>⚙️ 设置</button></div></aside><main className="gm-main"><div className="gm-mobile-brand"><strong>🐶 GrowMate</strong><button className="gm-text-button" onClick={() => navigate("settings")}>⚙️ 设置</button></div>{error && <div className="gm-error-banner" role="alert"><span>{error}</span><button onClick={() => setError("")}>关闭提示</button></div>}{page === "home" ? <Home {...props} /> : page === "focus" ? <Focus {...props} /> : page === "forest" ? <Forest {...props} /> : page === "records" ? <Records {...props} /> : page === "companion" ? <Companion {...props} /> : <Settings {...props} />}<footer className="gm-footer">GrowMate · 记录保存在这台电脑上</footer></main>{toast && <div className="gm-toast" role="status">✓ {toast}</div>}<nav className="gm-bottom-nav" aria-label="移动主导航">{NAV.map(n => <button key={n.id} className={page === n.id ? "selected" : ""} onClick={() => navigate(n.id)}><span>{n.icon}</span>{n.label}</button>)}</nav></div>;
 }

@@ -24,6 +24,7 @@ data/meetingbro.db
 data/meetingbro.db-*
 data/growmate/
 data/growmate-qa/
+data/funasr-temp/
 data/growmate-web*.log
 data/voice_test_*.wav
 data/benchmark_profile_*.json

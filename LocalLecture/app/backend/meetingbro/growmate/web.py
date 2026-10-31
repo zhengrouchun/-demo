@@ -422,6 +422,11 @@ def create_app(directory: Path | None = None, *, enable_notifications=True, prov
         path = app.state.voice.export(identifier)
         return FileResponse(path, filename=path.name, media_type="text/markdown; charset=utf-8")
 
+    @app.delete("/api/voice/history/{identifier}")
+    async def voice_delete(identifier: str):
+        app.state.voice.delete_history(identifier)
+        return {"ok": True}
+
     @app.websocket("/api/voice/socket")
     async def voice_socket(ws: WebSocket):
         host = ws.headers.get("host")
