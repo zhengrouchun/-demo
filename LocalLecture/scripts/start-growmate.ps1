@@ -7,6 +7,19 @@ $frontendPath = Join-Path $repoPath 'app\frontend'
 $url = 'http://127.0.0.1:8876'
 $openUrl = if ($Transcript) { "$url/?transcript" } else { $url }
 
+if ($Transcript) {
+    $requiredModelFiles = @(
+        'models\classroom-benchmark\funasr-runtime\llama-funasr-cli.exe',
+        'models\classroom-benchmark\funasr\funasr-encoder-f16.gguf',
+        'models\classroom-benchmark\funasr\qwen3-0.6b-q8_0.gguf'
+    )
+    foreach ($relativePath in $requiredModelFiles) {
+        if (-not (Test-Path -LiteralPath (Join-Path $repoPath $relativePath))) {
+            throw "缺少本地转写模型文件：$relativePath。请先下载并放入 LocalLecture/models/classroom-benchmark。"
+        }
+    }
+}
+
 if (-not (Test-Path -LiteralPath $pythonPath)) {
     throw '未找到 Python 环境。请先在 LocalLecture 目录运行 .\scripts\install.ps1。'
 }

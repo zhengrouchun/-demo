@@ -16,10 +16,12 @@ Windows CPU 版 `llama-funasr-cli.exe` 能运行，但从 Python 子进程收到
 | `growmate/transcript.py` | 按会话记录的实际模型写 Markdown 标题，旧历史继续显示 Whisper。 |
 | `growmate/web.py` | 新增单条历史 DELETE 路由，复用已有错误响应。 |
 | `growmate/Voice.tsx`、`GrowMateApp.tsx`、`main.tsx` | 专用页面固定系统声音和 Fun-ASR-Nano，保留开始、暂停、结束、预览、历史下载及确认删除；原 GrowMate 入口保持可用。 |
-| `scripts/start-growmate.ps1`、`启动课堂系统声音转文字.cmd` | 双击入口启动原后端并打开 `/?transcript`；已运行时直接打开同一页面。 |
+| `scripts/start-growmate.ps1`、`启动课堂系统声音转文字.cmd` | 双击入口先检查本地 CPU 程序及两份模型权重，随后启动原后端并打开 `/?transcript`；服务已运行时直接打开同一页面。 |
 | `LocalLecture/.gitignore` | 忽略运行时的短窗临时音频目录，防止录音片段进入提交。 |
 | `test_funasr_cli_adapter.py` | 用伪造的 SRT 和非 UTF-8 诊断字节验证时间戳、文本与临时文件清理。 |
 | `test_growmate.py` | 用真实 25 秒测试音频走完整子进程，验证中文路径、模型名、导出及资源清理。 |
+
+启动脚本新增语句的作用：`if ($Transcript)` 让文件检查只在课堂转写入口执行；`$requiredModelFiles = @(...)` 明确列出 CPU 程序、encoder 和 decoder 三个必需文件；`foreach ($relativePath in $requiredModelFiles)` 逐个检查，避免只验证其中一个；`Join-Path $repoPath $relativePath` 把相对位置定位到 LocalLecture；`Test-Path -LiteralPath` 判断该文件是否存在；`-not` 使缺失文件进入错误分支；`throw` 告诉用户具体缺少哪个文件并停止启动，避免服务已打开却在开始转写时才报错。两个右花括号分别结束循环和课堂入口条件。
 | `test_voice_history_delete.py` | 建立两份隔离课程，验证只删除选中记录、活动课程拒绝、越界路径拒绝和数据库异常后的文件恢复。 |
 
 ## 验证与限制
