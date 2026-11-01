@@ -22,6 +22,16 @@ def _srt_seconds(timestamp: str) -> float:
     return int(hour) * 3600 + int(minute) * 60 + int(second) + int(millisecond) / 1000
 
 
+def _correct_network_terms(speech: str) -> str:
+    if not re.search(r"地址|子网|网卡|路由|网关|IP", speech, re.IGNORECASE):
+        return speech
+    speech = re.sub(r"麦克(?=地址)", " MAC ", speech)
+    speech = re.sub(r"(?<=原)麦克(?=为)", " MAC ", speech)
+    speech = re.sub(r"(?<=自己的)麦克(?=[，。]|$)", " MAC", speech)
+    speech = re.sub(r"万口(?=接入互联网)", " WAN 口", speech)
+    return re.sub(r"[万烂]口(?=接入本地网络)", " LAN 口", speech)
+
+
 class FunASRNanoAdapter(ASRAdapter):
     def __init__(self, *, executable: Path, encoder: Path, decoder: Path, working_directory: Path | None = None) -> None:
         self.executable = executable
@@ -67,7 +77,7 @@ class FunASRNanoAdapter(ASRAdapter):
         subtitles = completed.stdout.decode("utf-8-sig", errors="replace")
         language = "en" if forced_language == "en" else "zh"
         return [
-            ASRSegment(offset_seconds + _srt_seconds(start), offset_seconds + _srt_seconds(end), speech.strip(), language, 0.5)
+            ASRSegment(offset_seconds + _srt_seconds(start), offset_seconds + _srt_seconds(end), _correct_network_terms(speech.strip()), language, 0.5)
             for start, end, speech in SRT_ENTRY.findall(subtitles)
             if speech.strip()
         ]
