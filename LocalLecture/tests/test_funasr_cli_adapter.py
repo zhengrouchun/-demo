@@ -57,6 +57,46 @@ class FunASRNanoAdapterTests(unittest.TestCase):
             ],
         )
 
+    def test_configured_window_is_forwarded_to_local_runtime(self):
+        adapter = FunASRNanoAdapter(
+            executable=Path("C:/models/llama-funasr-cli.exe"),
+            encoder=Path("C:/models/encoder.gguf"),
+            decoder=Path("C:/models/decoder.gguf"),
+            chunk_seconds=30,
+        )
+        with patch("meetingbro.asr.funasr_cli_adapter.subprocess.run") as run:
+            run.return_value.stdout = b""
+            run.return_value.stderr = b""
+            run.return_value.returncode = 0
+            adapter.transcribe(np.zeros(16000, dtype=np.float32), 16000)
+        command = run.call_args.args[0]
+        self.assertEqual(command[command.index("--chunk") + 1], "30")
+
+    def test_network_acronyms_from_long_window_keep_standard_spelling(self):
+        adapter = FunASRNanoAdapter(
+            executable=Path("C:/models/llama-funasr-cli.exe"),
+            encoder=Path("C:/models/encoder.gguf"),
+            decoder=Path("C:/models/decoder.gguf"),
+        )
+        srt = (
+            "1\n00:00:00,000 --> 00:00:10,000\n"
+            "计算机 b 的 mac 地址。路由器有一个 one 口接入互联网，多个 lan 口接入本地网络。\n\n"
+            "2\n00:00:10,000 --> 00:00:20,000\n"
+            "one 口喝水，MacBook 放在桌上。\n"
+        )
+        with patch("meetingbro.asr.funasr_cli_adapter.subprocess.run") as run:
+            run.return_value.stdout = srt.encode("utf-8")
+            run.return_value.stderr = b""
+            run.return_value.returncode = 0
+            segments = adapter.transcribe(np.zeros(320000, dtype=np.float32), 16000)
+        self.assertEqual(
+            [segment.text for segment in segments],
+            [
+                "计算机 b 的 MAC 地址。路由器有一个 WAN 口接入互联网，多个 LAN 口接入本地网络。",
+                "one 口喝水，MacBook 放在桌上。",
+            ],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

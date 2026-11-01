@@ -63,6 +63,7 @@ async def _run(options, commands, events):
             encoder=model_root / "funasr" / "funasr-encoder-f16.gguf",
             decoder=model_root / "funasr" / "qwen3-0.6b-q8_0.gguf",
             working_directory=model_root.parent.parent,
+            chunk_seconds=30,
         )
         await asyncio.to_thread(asr.ensure_loaded)
     else:
@@ -93,6 +94,7 @@ async def _run(options, commands, events):
     coverage_options = session_options(options["language"])
     if selected_model == "funasr-nano-gguf-q8_0":
         coverage_options["asr_early_flush_enabled"] = False
+        coverage_options["asr_accumulation_seconds"] = 30.0
     manager = TranscriptSession(SessionConfig(
         audio_source=source,  # 接收用户选定的麦克风或系统音频。
         audio_source_name=options["source"],  # 保存音频来源供状态显示。

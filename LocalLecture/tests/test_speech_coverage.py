@@ -139,6 +139,21 @@ class CoverageTests(unittest.IsolatedAsyncioTestCase):
 
 
 class WarningTests(unittest.TestCase):
+    def test_pending_preview_is_visible_without_being_saved(self):
+        with tempfile.TemporaryDirectory() as folder:
+            repo = Repository(Path(folder) / "app.db")
+            try:
+                controller = VoiceController(repo, Path(folder))
+                draft = {"id": "draft", "start_time": 0.0, "end_time": 30.0, "text": "待确认的课堂文字"}
+                controller._event({"type": "transcript_preview", "payload": {"segment": draft}})
+                snapshot = controller.snapshot()["payload"]
+                self.assertEqual(snapshot["preview"], draft)
+                self.assertEqual(snapshot["segments"], [])
+                controller._event({"type": "transcript_preview", "payload": {"segment": None}})
+                self.assertIsNone(controller.snapshot()["payload"]["preview"])
+            finally:
+                repo.close()
+
     def test_capture_warning_survives_progress_and_export(self):
         with tempfile.TemporaryDirectory() as folder:
             repo = Repository(Path(folder) / "app.db")  # 只使用临时数据库。

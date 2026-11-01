@@ -29,15 +29,19 @@ def _correct_network_terms(speech: str) -> str:
     speech = re.sub(r"(?<=原)麦克(?=为)", " MAC ", speech)
     speech = re.sub(r"(?<=自己的)麦克(?=[，。]|$)", " MAC", speech)
     speech = re.sub(r"万口(?=接入互联网)", " WAN 口", speech)
-    return re.sub(r"[万烂]口(?=接入本地网络)", " LAN 口", speech)
+    speech = re.sub(r"[万烂]口(?=接入本地网络)", " LAN 口", speech)
+    speech = re.sub(r"\s*one\s*口(?=接入互联网)", " WAN 口", speech, flags=re.IGNORECASE)
+    speech = re.sub(r"(?<![A-Za-z])mac(?![A-Za-z])", "MAC", speech, flags=re.IGNORECASE)
+    return re.sub(r"(?<![A-Za-z])lan(?![A-Za-z])", "LAN", speech, flags=re.IGNORECASE)
 
 
 class FunASRNanoAdapter(ASRAdapter):
-    def __init__(self, *, executable: Path, encoder: Path, decoder: Path, working_directory: Path | None = None) -> None:
+    def __init__(self, *, executable: Path, encoder: Path, decoder: Path, working_directory: Path | None = None, chunk_seconds: int = 10) -> None:
         self.executable = executable
         self.encoder = encoder
         self.decoder = decoder
         self.working_directory = working_directory
+        self.chunk_seconds = chunk_seconds
 
     def _command_path(self, path: Path) -> str:
         if self.working_directory:
@@ -69,7 +73,7 @@ class FunASRNanoAdapter(ASRAdapter):
         with tempfile.TemporaryDirectory(prefix="locallecture-funasr-", dir=temporary_root) as temporary_directory:
             wav_path = Path(temporary_directory) / "window.wav"
             sf.write(wav_path, np.clip(samples, -1, 1), sample_rate, subtype="PCM_16")
-            command = [str(self.executable), "--enc", self._command_path(self.encoder), "-m", self._command_path(self.decoder), "--chunk", "10", "--srt", "-a", self._command_path(wav_path)]
+            command = [str(self.executable), "--enc", self._command_path(self.encoder), "-m", self._command_path(self.decoder), "--chunk", str(self.chunk_seconds), "--srt", "-a", self._command_path(wav_path)]
             completed = subprocess.run(command, cwd=self.working_directory, check=False, capture_output=True, timeout=max(120, len(samples) / sample_rate * 3))
         if completed.returncode != 0:
             diagnostic = completed.stderr[-500:].decode("utf-8", errors="replace")

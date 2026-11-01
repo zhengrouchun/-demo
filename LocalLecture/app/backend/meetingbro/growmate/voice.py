@@ -30,6 +30,7 @@ class VoiceController:
         self.phase = "idle"
         self.detail = "准备好后，开始实时转文字。"
         self.segments: dict[str, dict] = {}
+        self.preview = None
         self.stats = {}
         self.lock = asyncio.Lock()
         with repo.transaction():
@@ -40,7 +41,7 @@ class VoiceController:
 
     def snapshot(self):
         rows = self.repo.rows("SELECT * FROM voice_sessions WHERE id=?", (self.current_id,)) if self.current_id else []
-        return {"type": "voice_snapshot", "payload": {"phase": self.phase, "detail": self.detail, "session": rows[0] if rows else None, "segments": sorted(self.segments.values(), key=lambda s: s["start_time"]), "stats": self.stats, "worker_pid": self.process.pid if self.active() else None, "resources_released": not self.active()}}
+        return {"type": "voice_snapshot", "payload": {"phase": self.phase, "detail": self.detail, "session": rows[0] if rows else None, "segments": sorted(self.segments.values(), key=lambda s: s["start_time"]), "preview": self.preview, "stats": self.stats, "worker_pid": self.process.pid if self.active() else None, "resources_released": not self.active()}}
 
     async def broadcast(self, event):
         for listener in list(self.listeners):
@@ -68,6 +69,7 @@ class VoiceController:
             self.phase = "loading"
             self.detail = "正在加载本地识别模型，请等待。"
             self.segments = {}
+            self.preview = None
             self.stats = {}
             payload = dict(options, id=identifier, app_db=str(self.repo.path), transcript_db=str(self.transcript_db))
             self.process = context.Process(target=run_voice_worker, args=(payload, self.commands, self.events), name="LocalLecture-ASR", daemon=True)
@@ -117,6 +119,8 @@ class VoiceController:
                 self.repo.db.execute("UPDATE voice_sessions SET meeting_id=?,elapsed_seconds=?,status=? WHERE id=?", (payload["meeting_id"], payload.get("elapsed_seconds", 0), self.phase, self.current_id))
         elif kind == "transcript_segment":
             self.segments[payload["id"]] = payload
+        elif kind == "transcript_preview":
+            self.preview = payload.get("segment")
         elif kind == "transcript_segment_removed":
             self.segments.pop(payload.get("segment_id") or payload.get("id"), None)
         elif kind == "draining":
@@ -187,6 +191,7 @@ class VoiceController:
                 with self.repo.transaction():
                     self.repo.db.execute("UPDATE voice_sessions SET status='export_failed' WHERE id=?", (self.current_id,))
         finally:
+            self.preview = None
             for ipc in (self.commands, self.events):
                 if ipc:
                     ipc.close()

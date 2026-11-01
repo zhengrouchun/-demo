@@ -245,6 +245,7 @@ class VoiceProcessTests(unittest.IsolatedAsyncioTestCase):
                 snapshot = controller.snapshot()["payload"]
                 self.assertEqual(snapshot["phase"], "ended", snapshot)
                 self.assertTrue(snapshot["segments"])
+                self.assertEqual(len(snapshot["segments"]), 1)
                 exported = Path(snapshot["session"]["export_path"])
                 self.assertIn("Fun-ASR-Nano GGUF Q8_0 / CPU", exported.read_text(encoding="utf-8"))
                 self.assertFalse(list(app_data.rglob("*.wav")))
